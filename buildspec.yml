@@ -1,0 +1,13 @@
+version: 0.1
+
+phases:
+  build: 
+    commands:
+      - echo Noting to do yet
+artifacts:
+  files:
+    - index.html
+    - flavicon.ico
+    - documents/*
+    - images/*
+    - styles/*
