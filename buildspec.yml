@@ -7,7 +7,7 @@ phases:
 artifacts:
   files:
     - index.html
-    - flavicon.ico
+    - favicon.ico
     - documents/*
     - images/*
     - styles/*
