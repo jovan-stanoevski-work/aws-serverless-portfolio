@@ -12,6 +12,13 @@ def lambda_handler(event, context):
         "objectKey": 'codebuild-aws-serverless-portfolio.zip'
         }
     try:
+        job = event.get("CodePipeline.job")
+        if job:
+            print "Lambda triggered from codepipeline event"
+            for artifact in job["data"]["inputArtifacts"]:
+                if artifact["name"] == "jovan-stanoevski-work-deploy-serverless-portfolio":
+                    location = artifact["location"]["s3Location"]
+        print "Building portfolio from " + str(location)
         s3 = boto3.resource('s3')
         
         portfolio_bucket = s3.Bucket('jovan.stanoevski.work')
@@ -29,6 +36,11 @@ def lambda_handler(event, context):
                 ExtraArgs={'ContentType': mimetypes.guess_type(nm)[0]})
                 portfolio_bucket.Object(nm).Acl().put(ACL='public-read')
         topic.publish(Subject="Serverless Portfolio jovan.stanoevski.work Deployed Successfully", Message="Serverless Portfolio jovan.stanoevski.work Deployed Successfully")
+        if job:
+            codepipeline = boto3.client('codepipeline')
+            codepipeline.put_job_success_result(jobId=job["id"])
+        topic.publish(Subject="Serverless Portfolio", Message="Serverless Portfolio Deployed Successfully")
+        print "Job Complete."
     except:
         topic.publish(Subject="Serverless Portfolio jovan.stanoevski.work Deployment Failed", Message="Serverless Portfolio jovan.stanoevski.work Not Deployed Successfully")
         raise
